@@ -8,7 +8,7 @@ This object represents a Telegram user or bot.
     username	String	   Optional. User‘s or bot’s username
 =#
 
-type user
+type User
     __id::Int32
     __first_name::UTF8String
     __last_name::UTF8String
@@ -27,7 +27,7 @@ This object represents a chat.
     last_name	String	  Optional. Last name of the other party in a private chat
 =#
 
-type chat
+type Chat
     __id::Int32
     __type::UTF8String
     __title::UTF8String
@@ -46,7 +46,7 @@ This object represents one special entity in a text message. For example, hashta
     url	String	Optional. For “text_link” only, url that will be opened after user taps on the text
 =#
 
-type message_entity
+type MessageEntity
     __type::UTF8String
     __offset::Int32
     __length::Int32
@@ -65,7 +65,7 @@ This object represents an audio file to be treated as music by the Telegram clie
     file_size	Integer	Optional. File size
 =#
 
-type audio
+type Audio
     __file_id::UTF8String
     __duration::Int32
     __performer::UTF8String
@@ -84,7 +84,7 @@ This object represents one size of a photo or a file / sticker thumbnail.
     file_size	Integer	Optional. File size
 =#
 
-type photo_size
+type PhotoSize
     __file_id::UTF8String
     __width::Int32
     __height::Int32
@@ -102,9 +102,9 @@ This object represents a general file (as opposed to photos, voice messages and 
     file_size	Integer	Optional. File size
 =#
 
-type document
+type Document
     __file_id::UTF8String
-    __thumb::photo_size
+    __thumb::PhotoSize
     __file_name::UTF8String
     __mime_type::UTF8String
     __file_size::Int32
@@ -121,11 +121,11 @@ This object represents a sticker.
     file_size	Integer	Optional. File size
 =#
 
-type sticker
+type Sticker
     __file_id::UTF8String
     __width::Int32
     __height::Int32
-    __thumb::photo_size
+    __thumb::PhotoSize
     __file_size::Int32
 end
 
@@ -142,12 +142,12 @@ This object represents a video file.
     file_size	Integer	Optional. File size
 =#
 
-type video
+type Video
     __file_id::UTF8String
     __width::Int32
     __height::Int32
     __duration::Int32
-    __thumb::photo_size
+    __thumb::PhotoSize
     __mime_type::UTF8String
     __file_size::Int32
 end
@@ -162,7 +162,7 @@ This object represents a voice note.
     file_size	Integer	Optional. File size
 =#
 
-type voice
+type Voice
     __file_id::UTF8String
     __duration::Int32
     __mime_type::UTF8String
@@ -179,7 +179,7 @@ This object represents a phone contact.
     user_id	Integer	Optional. Contact's user identifier in Telegram
 =#
 
-type contact
+type Contact
     __phone_number::UTF8String
     __first_name::UTF8String
     __last_name::UTF8String
@@ -194,7 +194,7 @@ This object represents a point on the map.
     latitude	Float	Latitude as defined by sender
 =#
 
-type location
+type Location
     __longitude::Float32
     __latitude::Float32
 end
@@ -209,8 +209,8 @@ This object represents a venue.
     foursquare_id	String	Optional. Foursquare identifier of the venue
 =#
 
-type venue
-    __location::location
+type Venue
+    __location::Location
     __title::UTF8String
     __address::UTF8String
     __foursquare_id::UTF8String
@@ -252,35 +252,112 @@ This object represents a message.
     pinned_message	Message	Optional. Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
 =#
 
-type message
+type Message
     __message_id::Int32
-    __from::user
+    __from::User
     __date::Int32
-    __chat::chat
-    __forward_from::user
+    __chat::Chat
+    __forward_from::User
     __forward_date::Int32
-    __replay_to_message::message
+    __replay_to_message::Message
     __text::UTF8String
-    __entities::Array{ message_entity, 1 }
-    __audio::audio
-    __document::document
-    __photo::Array{ photo_size, 1 }
-    __sticker::sticker
-    __video::video
-    __voice::voice
+    __entities::Array{ MessageEntity, 1 }
+    __audio::Audio
+    __document::Document
+    __photo::Array{ PhotoSize, 1 }
+    __sticker::Sticker
+    __video::Video
+    __voice::Voice
     __caption::UTF8String
-    __contact::contact
-    __location::location
-    __venue::venue
-    __new_chat_member::user
-    __left_chat_member::user
+    __contact::Contact
+    __location::Location
+    __venue::Venue
+    __new_chat_member::User
+    __left_chat_member::User
     __new_chat_title::UTF8String
-    __new_chat_photo::Array{ photo_size, 1 }
+    __new_chat_photo::Array{ PhotoSize, 1 }
     __delete_chat_photo::Bool=true
     __group_chat_created::Bool=true
     __channel_chat_created::Bool=true
     __migrate_to_chat_id::Int32
-    __pinned_message::message
+    __pinned_message::Message
+end
+
+#=
+This object represents an incoming inline query. When the user sends an empty query, your bot could return some default or trending results.
+
+    Field	Type	Description
+    id	String	Unique identifier for this query
+    from	User	Sender
+    location	Location	Optional. Sender location, only for bots that request user location
+    query	String	Text of the query
+    offset	String	Offset of the results to be returned, can be controlled by the bot
+=#
+
+type InlineQuery
+    __id::UTF8String
+    __from::User
+    __location::Location
+    __query::UTF8String
+    __offset::UTF8String
+end
+
+#=
+Represents a result of an inline query that was chosen by the user and sent to their chat partner.
+
+    Field	Type	Description
+    result_id	String	The unique identifier for the result that was chosen
+    from	User	The user that chose the result
+    location	Location	Optional. Sender location, only for bots that require user location
+    inline_message_id	String	Optional. Identifier of the sent inline message. Available only if there is an inline keyboard attached to the message. Will be also received in callback queries and can be used to edit the message.
+    query	String	The query that was used to obtain the result
+=#
+
+type ChosenInlineResult
+    __result_id::UTF8String
+    __from::User
+    __location::Location
+    __inline_message_id::UTF8String
+    __query::UTF8String
+end
+
+#=
+This object represents an incoming callback query from a callback button in an inline keyboard. If the button that originated the query was attached to a message sent by the bot, the field message will be presented. If the button was attached to a message sent via the bot (in inline mode), the field inline_message_id will be presented.
+
+    Field	Type	Description
+    id	String	Unique identifier for this query
+    from	User	Sender
+    message	Message	Optional. Message with the callback button that originated the query. Note that message content and message date will not be available if the message is too old
+    inline_message_id	String	Optional. Identifier of the message sent via the bot in inline mode, that originated the query
+    data	String	Data associated with the callback button. Be aware that a bad client can send arbitrary data in this field
+=#
+
+type CallbackQuery
+    __id::UTF8String
+    __from::User
+    __message::Message
+    __inline_message_id::UTF8String
+    __data::UTF8String
+end
+
+#=
+This object represents an incoming update.
+Only one of the optional parameters can be present in any given update.
+
+    Field	Type	Description
+    update_id	Integer	The update‘s unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you’re using Webhooks, since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order.
+    message	Message	Optional. New incoming message of any kind — text, photo, sticker, etc.
+    inline_query	InlineQuery	Optional. New incoming inline query
+    chosen_inline_result	ChosenInlineResult	Optional. The result of an inline query that was chosen by a user and sent to their chat partner.
+    callback_query	CallbackQuery	Optional. New incoming callback query
+=#
+
+type Update
+    __update_id::Int32
+    __message::Message
+    __inline_query::InlineQuery
+    __chosen_inline_result::ChosenInlineResult
+    __callback_query::CallbackQuery
 end
 
 #=
@@ -291,9 +368,9 @@ This object represent a user's profile pictures.
     photos	Array of Array of PhotoSize	Requested profile pictures (in up to 4 sizes each)
 =#
 
-type user_profile_photos
+type UserProfilePhotos
     __total_count::Int32
-    __photos::Array{ photo_size, 1 }
+    __photos::Array{ PhotoSize, 1 }
 end
 
 #=
@@ -306,7 +383,7 @@ This object represents a file ready to be downloaded. The file can be downloaded
     file_path	String	Optional. File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file.
 =#
 
-type file
+type File
     __file_id::UTF8String
     __file_size::Int32
     __file_path::UTF8String
@@ -321,7 +398,7 @@ This object represents one button of the reply keyboard. For simple text buttons
     request_location	Boolean	Optional. If True, the user's current location will be sent when the button is pressed. Available in private chats only
 =#
 
-type keyboard_button
+type KeyboardButton
     __text::UTF8String
     __requested_contact::Bool
     __requested_location::Bool
@@ -339,8 +416,8 @@ This object represents a custom keyboard with reply options (see Introduction to
     Example: A user requests to change the bot‘s language, bot replies to the request with a keyboard to select the new language. Other users in the group don’t see the keyboard.
 =#
 
-type reply_keyboard_markup
-    __keyboard::Array{ keyboard_button, 1 }
+type ReplyKeyboardMarkup
+    __keyboard::Array{ KeyboardButton, 1 }
     __resize_keyboard::Bool
     __one_time_keyboard::Bool
     __selective::Bool
@@ -356,7 +433,7 @@ Upon receiving a message with this object, Telegram clients will hide the curren
     Example: A user votes in a poll, bot returns confirmation message in reply to the vote and hides keyboard for that user, while still showing the keyboard with poll options to users who haven't voted yet.
 =#
 
-type reply_keyboard_hide
+type ReplyKeyboardHide
     __hide_keyboard::Bool=true
     __selective::Bool
 end
@@ -374,7 +451,7 @@ This object represents one button of an inline keyboard. You must use exactly on
     Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will display unsupported message.
 =#
 
-type inline_keyboard_button
+type InlineKeyboardButton
     __text::UTF8String
     __url::UTF8String
     __callback_data::UTF8String
@@ -390,27 +467,8 @@ This object represents an inline keyboard that appears right next to the message
     Note: This will only work in Telegram versions released after 9 April, 2016. Older clients will display unsupported message
 =#
 
-type inline_keyboard_markup
-    __inline_keyboard::Array{ Array{ inline_keyboard_button, 1 }, 1 }
-end
-
-#=
-This object represents an incoming callback query from a callback button in an inline keyboard. If the button that originated the query was attached to a message sent by the bot, the field message will be presented. If the button was attached to a message sent via the bot (in inline mode), the field inline_message_id will be presented.
-
-    Field	Type	Description
-    id	String	Unique identifier for this query
-    from	User	Sender
-    message	Message	Optional. Message with the callback button that originated the query. Note that message content and message date will not be available if the message is too old
-    inline_message_id	String	Optional. Identifier of the message sent via the bot in inline mode, that originated the query
-    data	String	Data associated with the callback button. Be aware that a bad client can send arbitrary data in this field
-=#
-
-type callback_query
-    __id::UTF8String
-    __from::user
-    __message::message
-    __inline_message_id::UTF8String
-    __data::UTF8String
+type InlineKeyboardMarkup
+    __inline_keyboard::Array{ Array{ InlineKeyboardButton, 1 }, 1 }
 end
 
 #=
@@ -425,7 +483,7 @@ Upon receiving a message with this object, Telegram clients will display a reply
     The last option is definitely more attractive. And if you use ForceReply in your bot‘s questions, it will receive the user’s answers even if it only receives replies, commands and mentions — without any extra work for the user.
 =#
 
-type force_reply
+type ForceReply
     __force_reply::Bool=true
     __selective::Bool
 end
